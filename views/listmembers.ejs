@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <%- include('partials/header1.ejs') %>
+        <style>
+            table, th, td {
+                 
+              border: 3px solid black;
+              border-color: #96D4D4;
+            }
+            </style>
+    </head>
+<body>
+    <%- include('partials/navbar1.ejs') %>
+    <div class="container">
+        <h2>Members</h2>
+        <table style="width:100%">
+            <tr>
+                <th>email  </th>
+                <th>firstname  </th>
+                <th>lastname  </th>
+                <th>raceclass</th>
+                <th>    </th>
+            </tr>
+
+            <% if (membersData !=0) {var i=1; membersData.forEach( function(data) {
+            %>
+            <tr>
+                <td><%=data.email   %></td>
+                <td><%=data.firstname   %></td>
+                <td><%=data.lastname   %></td>
+                <td><%=data.raceclass   %></td>
+                <td></td>
+            </tr>
+            <% i++; }) %> <%}%>    
+        </table>
+
+    </div>
+</body>
+</html>

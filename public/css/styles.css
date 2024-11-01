@@ -1,0 +1,21 @@
+
+
+h2 {
+    color:green;
+
+}
+
+h4 {
+    color:purple;
+    
+}
+
+p {
+    color:red;
+}
+.img2 {
+    float: right;
+     max-width: 600px;
+     margin-left: 20px;
+    }
+

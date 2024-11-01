@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <%- include('partials/header1.ejs') %>
+    </head>
+    <body>
+        <%- include('partials/navbar1.ejs') %>
+        <div class="container">
+            <h2>Register</h2>
+            <form method="POST">
+                <br><br>
+                <label for="email">Email</label>
+                <input type="text" id="email" placeholder="email address" name="email">
+                <br>
+                <label for="name">firstname</label>
+                <input type="text" id="firstname" placeholder="firstname" name="firstname">
+                <br>
+                <label for="firstname">lastname</label>
+                <input type="text" id="lastname" placeholder="lastname" name="lastname">
+                <br>
+                <label for="lastname">raceclass</label>
+                <input type="text" id="raceclass" placeholder="raceclass" name="raceclass">
+                <br>
+                <label for="raceclass">age</label>
+                <input type="text" id="age" placeholder="age" name="age">
+                <br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+        </body>
+</html>
