@@ -13,10 +13,9 @@ app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', function (req, res){
-    res.render("home");
- });
 
+
+ 
  app.get('/register', function (req, res){
     res.render("register");
  });
@@ -35,7 +34,7 @@ app.get('/', function (req, res){
         function(error, results, fields) {
             if (error) throw error;
             if(results.length > 0) {
-                req.session.loggedin = true;
+                req.session.loggedIn = true;
                 req.session.username= name;
                 res.redirect('/membersOnly');
             }else {
@@ -52,10 +51,16 @@ app.get('/', function (req, res){
  });
 
  // Users can access this if they are logged in
- let loggedin = false;
+ let loggedIn = false;
+    console.log ('loggedin?', loggedIn)
+ 
+
+
+ 
  app.get('/membersOnly', function (req, res, next) {
-    if (req.session.loggedin === true) {
-        let loggedin = true;
+    if (req.session.loggedIn = true) {
+        let loggedIn = true;
+        console.log('loggedin?', loggedIn)
         res.render('membersOnly');
     }
     else {
@@ -66,7 +71,7 @@ app.get('/', function (req, res){
 
 // User can on se this page if they are logged in
 app.get('/addMPs', function (req, res, next) {
-    if (req.session.loggedin) {
+    if (req.session.loggedIn) {
         res.render('addMPs');
     }
     else {
@@ -118,8 +123,15 @@ app.post('/addMPs', function(req, res, next) {
 
  app.get('/logout', (req,res) => {
     req.session.destroy();
+    console.log('session killed')
+    console.log('loggedin?', loggedIn)
     res.redirect('/');
  });
 
 app.listen(3000);
 console.log('Node app is running on port 3000');
+
+
+app.get('/', function (req, res){
+    res.render("home", { loggedIn: req.session.loggedIn });
+  });
