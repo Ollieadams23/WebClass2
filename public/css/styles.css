@@ -1,21 +1,34 @@
-
-
+body {
+    background-color: black;
+}
+h1 {
+    color: white;
+}
 h2 {
-    color:green;
-
+    color: green;
 }
 
 h4 {
-    color:purple;
-    
+    color: purple;
 }
 
-p {
-    color:red;
-}
+
 .img2 {
     float: right;
-     max-width: 600px;
-     margin-left: 20px;
-    }
+    max-width: 600px;
+    margin-left: 20px;
+}
 
+.nav-link {
+    color: white;
+    
+}
+.nav-link:hover {
+    color: red;
+}
+
+.register {
+    color: rgb(225, 15, 15);
+    text-align: left;
+    text-size-adjust: 50px;
+}

@@ -1,13 +1,15 @@
 <html>
     <head>
+        <%- include('partials/navbar.ejs') %>
         <%- include('partials/header1.ejs') %>
     </head>
     <body>
-        <%- include('partials/navbar.ejs') %>
-        <div class="container">
-            <h2>Register</h2>
+        
+        <div class="register">
+            <p style="color: green;">Register</p>
             <form method="POST">
                 <br><br>
+            
                 <label for="email">Email</label>
                 <input type="text" id="email" placeholder="email address" name="email">
                 <br>
@@ -22,6 +24,7 @@
                 <br>
                 <label for="raceclass">age</label>
                 <input type="text" id="age" placeholder="age" name="age">
+                
                 <br>
                 <button type="submit">Submit</button>
             </form>

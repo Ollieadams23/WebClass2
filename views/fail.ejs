@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAIL</title>
+</head>
+<body>
+    <div class="container" style="display: flex; justify-content: center; align-items: center;"> 
+        <h2>You have tried circumventing security</h2>
+        <img src="/public/images/fail.jpg" style="margin: auto;"/>   
+</body>
+
+<script>
+    const failMessage = document.querySelector('h2');
+    const colors = ['#FF0000', '#FFFF00', '#00FF00', '#0000FF', '#FF00FF'];
+    let i = 0;
+  
+    setInterval(() => {
+      failMessage.style.color = colors[i];
+      i = (i + 1) % colors.length;
+    }, 50);
+  </script>
+
+</html>

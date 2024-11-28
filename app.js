@@ -1,10 +1,10 @@
-var express = require('express');
-var app = express();
-var session = require('express-session');
-var conn = require('./dbConfig');
+const express = require('express');
+const app = express();
+const session = require('express-session');
+const conn = require('./dbConfig');
 app.set('view engine','ejs');
 app.use(session({
-    secret: 'yoursecret',
+    secret: process.env.SESSION_SECRET,S
     resave: true,
     saveUninitialized: true
 }))
@@ -13,7 +13,17 @@ app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Set up middleware and global variables
+app.use((req, res, next) => {
+    app.locals.loggedIn = req.session.loggedIn;
+    next();
+  });
 
+
+  //define routes
+  app.get('/', function (req, res){
+    res.render("home");
+  });
 
  
  app.get('/register', function (req, res){
@@ -35,8 +45,8 @@ app.use(express.urlencoded({ extended: true }));
             if (error) throw error;
             if(results.length > 0) {
                 req.session.loggedIn = true;
-                req.session.username= name;
-                res.redirect('/membersOnly');
+                req.session.username = name;
+                res.redirect('/profile');
             }else {
                 res.send('Incorrect Username and/or Password!');
             }
@@ -57,14 +67,14 @@ app.use(express.urlencoded({ extended: true }));
 
 
  
- app.get('/membersOnly', function (req, res, next) {
-    if (req.session.loggedIn = true) {
-        let loggedIn = true;
-        console.log('loggedin?', loggedIn)
-        res.render('membersOnly');
+ app.get('/profile', function (req, res, next) {
+    if (req.session.loggedIn === true) {
+        console.log('loggedin?', req.session.loggedIn)
+        res.render('profile', { username: req.session.username });
+        
     }
     else {
-        res.send('Please login to view this page!');
+        res.render('fail');
     }
 
  });
@@ -78,12 +88,12 @@ app.get('/addMPs', function (req, res, next) {
         res.send('please login to view this page!');
     }
 })
-app.get('/auckland', function(req, res){
-    res.render("auckland");
+app.get('/results', function(req, res){
+    res.render("results");
  });
 
- app.get('/beaches', function(req, res){
-    res.render("beaches");
+ app.get('/rules', function(req, res){
+    res.render("rules");
  });
 
  //registration
@@ -128,10 +138,10 @@ app.post('/addMPs', function(req, res, next) {
     res.redirect('/');
  });
 
+
+ //start server
 app.listen(3000);
 console.log('Node app is running on port 3000');
 
 
-app.get('/', function (req, res){
-    res.render("home", { loggedIn: req.session.loggedIn });
-  });
+
