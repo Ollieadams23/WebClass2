@@ -3,12 +3,22 @@ const app = express();
 const session = require('express-session');
 const conn = require('./dbConfig');
 app.set('view engine','ejs');
+
+// Import required modules
+//start setup password reset
+const nodemailer = require('nodemailer');
+const ejs = require('ejs');
+
+
+
+
 app.use(session({
-    secret: process.env.SESSION_SECRET,S
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true
 }))
 app.use('/public', express.static('public'));
+app.use(express.static('/public/images'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,7 +30,95 @@ app.use((req, res, next) => {
   });
 
 
+  //define functions
+  const fs = require('fs');
+const path = require('path');
+
+function getFiles() {
+  const directoryPath = path.join(__dirname, 'public/events');
+  const files = fs.readdirSync(directoryPath);
+  return files;
+}
+
+
+  //test db links
+//conn.query('SELECT * FROM members', function(err, results) {
+ //   if (err) throw err;
+ //   console.log(results);
+//});
+
+
   //define routes
+// Set up email transport using Nodemailer
+const transport = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  auth: {
+    user: 'ollieadams511@gmail.com',
+    pass: 'jesus48667722'
+  }
+});
+
+// Define password reset email template
+const passwordResetTemplate = (user, resetLink) => {
+  return ejs.render(`
+    <h1>Password Reset Request</h1>
+    <p>Click this link to reset your password: <a href="${resetLink}">${resetLink}</a></p>
+  `, { user, resetLink });
+};
+
+// Define route for sending password reset email
+app.post('/resetPass', (req, res) => {
+  const email = req.body.email;
+  const user = { email }; // retrieve user from database using email
+  const resetLink = 'localhost:3000/resetpassword'; // generate password reset link
+  const html = passwordResetTemplate(user, resetLink);
+
+  // Send email using nodemailer
+  transport.sendMail({
+    from: 'your-email@example.com',
+    to: email,
+    subject: 'Password Reset Request',
+    html
+  }, (err, info) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error sending email');
+    } else {
+      res.send('Password reset email sent successfully');
+    }
+  })
+})
+
+const router = express.Router();
+router.post('/resetPass', (req, res) => {
+  const { email } = req.body;
+  const user = { email }; // retrieve user from database using email
+  const resetLink = 'localhost:3000/resetpassword'; // generate password reset link
+  const html = passwordResetTemplate(user, resetLink);
+
+
+  // Send email using Nodemailer
+  transport.sendMail({
+    from: 'your-email@example.com',
+    to: email,
+    subject: 'Password Reset Request',
+    html
+  }, (err, info) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error sending email');
+    } else {
+      res.send('Password reset email sent successfully');
+    }
+  });
+});
+
+// Export router
+module.exports = router;
+//end setup password reset
+
+
   app.get('/', function (req, res){
     res.render("home");
   });
@@ -30,23 +128,40 @@ app.use((req, res, next) => {
     res.render("register");
  });
 
+ app.get('/events', function (req, res) {
+    // Assuming you have a function to get the files
+    const files = getFiles();
+    res.render('events', { files: files });
+});
+ 
+
+
  app.get('/login', function(req, res) {
     res.render('login.ejs');
  });
 
+ 
+
 
 
  app.post('/auth', function(req, res){
-    let name = req.body.username;
+    let email = req.body.email;
     let password = req.body.password;
-    if (name && password) {
-        conn.query('SELECT * FROM users WHERE name = ? AND password = ?', [name, password],
+    if (email && password) {
+        conn.query('SELECT * FROM members WHERE email = ? AND password = ?', [email, password],
         function(error, results, fields) {
             if (error) throw error;
             if(results.length > 0) {
                 req.session.loggedIn = true;
-                req.session.username = name;
+                //req.session.username = results.email;
+                //req.session.role = results.role;
+                req.session.userData = results;//if i put [0] after results it doesnt work if i have it there i need to remove it from the calls in profile.ejs
+
+                console.log('ln 160', results);
+                
                 res.redirect('/profile');
+                
+                
             }else {
                 res.send('Incorrect Username and/or Password!');
             }
@@ -62,24 +177,32 @@ app.use((req, res, next) => {
 
  // Users can access this if they are logged in
  let loggedIn = false;
-    console.log ('loggedin?', loggedIn)
+    console.log ('loggedin app.js line 179?', loggedIn)
  
 
 
  
  app.get('/profile', function (req, res, next) {
+  //the next line is only for the console.log which isnt actually needed
+  //the other requests for the data access it directly
+  const results = req.session.userData;
+  console.log('userData', results);
     if (req.session.loggedIn === true) {
-        console.log('loggedin?', req.session.loggedIn)
-        res.render('profile', { username: req.session.username });
-        
-    }
+        console.log('loggedIn?app 189', req.session.loggedIn)
+        if 
+          (req.session.userData[0].role === 'admin')
+          res.render('profileAdmin', { userData: req.session.userData, loggedIn: req.session.loggedIn });
+        } else if
+          (req.session.role === 'member'){
+          res.render('profile', { userData: req.session.userData, loggedIn: req.session.loggedIn });
+        }
     else {
         res.render('fail');
     }
 
  });
 
-// User can on se this page if they are logged in
+// User can only see this page if they are logged in
 app.get('/addMPs', function (req, res, next) {
     if (req.session.loggedIn) {
         res.render('addMPs');
@@ -93,35 +216,44 @@ app.get('/results', function(req, res){
  });
 
  app.get('/rules', function(req, res){
-    res.render("rules");
+    res.sendFile(__dirname + '/public/Constitution2023.pdf');
  });
+
 
  //registration
  app.post('/register', function(req, res, next) {
-    var racenum = req.body.racenum;
+    
+    var email = req.body.email;
     var firstname = req.body.firstname;
     var lastname = req.body.lastname;
     var age = req.body.age;
+    var password = req.body.password;
     var raceclass = req.body.raceclass;
-    var sql = 'INSERT INTO members (email, firstname, lastname, age, raceclass) VALUES (?, ?, ?, ?, ?)';
-    conn.query(sql, [racenum, firstname, lastname, age, raceclass], function(err, result) {
+    var biketype = req.body.biketype;
+    var racenumber = req.body.racenumber;
+    var sql = 'SELECT * FROM members WHERE email = ?';
+    conn.query(sql, [email], function(err, result) {
         if (err) throw err;
-        console.log('record inserted');
-        res.render('register');
+        if (result.length > 0) {
+            res.render('register', {error: 'Email already in use'});
+        } else {
+            var sql1 = 'INSERT INTO members (email, firstname, lastname, age, password, raceclass) VALUES (?, ?, ?, ?, ?, ?)';
+            var sql2 = 'INSERT INTO class (raceclass, biketype, racenumber) VALUES (?, ?, ?)';
+
+            conn.query(sql1, [email, firstname, lastname, age, password, raceclass], function(err, result) {
+                if (err) throw err;
+                console.log('member record inserted');
+            });
+            conn.query(sql2, [raceclass, biketype, racenumber], function(err, result) {
+                if (err) throw err;
+                console.log('class record inserted');
+                res.render('register');
+            });
+        }
     });
 });
 
-app.post('/addMPs', function(req, res, next) {
-    var id = req.body.id;
-    var name = req.body.name;
-    var party = req.body.party;
-    var sql = 'INSERT INTO mps (id, name, party) VALUES (?, ?, ?)';
-    conn.query(sql, [id, name, party], function(err, result) {
-        if (err) throw err;
-        console.log('record inserted');
-        res.render('addMPs');
-    });
-});
+
 
  app.get('/listmembers', function (req, res){
     conn.query("SELECT * FROM members", function (err, result) {
@@ -134,7 +266,7 @@ app.post('/addMPs', function(req, res, next) {
  app.get('/logout', (req,res) => {
     req.session.destroy();
     console.log('session killed')
-    console.log('loggedin?', loggedIn)
+    console.log('loggedin app logout 154?', loggedIn)
     res.redirect('/');
  });
 

@@ -1,0 +1,33 @@
+@media only screen and (min-width: 1280px) {
+    /* styles for screens with a maximum width of 768px */
+        .login-form {
+            text-align: center;
+            color: violet;
+            border-radius: 50px; 
+            padding: 20px; 
+            background-color: rgba(186, 194, 151, 0.8); 
+            max-width: 33%;
+        }
+        .login-input {
+                font-size: 24px;
+        }
+        .login-submit {
+            font-size: 24px;
+            border-radius: 0px;
+        }
+        .login-form h1 {
+            font-size: 60px;
+        }
+        .login-form h1 a {
+            font-size: 60px;
+        }
+        /* override styles for smaller screens */
+    }
+
+
+@media only screen and (max-width: 480px) {
+    /* styles for screens with a maximum width of 480px */
+    .login-input {
+        font-size: 24px;
+    }
+}

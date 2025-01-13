@@ -5,18 +5,35 @@
     </head>
     <body>
         
-        <div>
-            <h1>Login or <a href="register">Register</a></h1>
-            
-            <form action="/auth" method="post">
-                <input type="text" name="username" placeholder="User Name" id="username" required>
-                <label for="password">
-                </label>
-                <input type="password" name="password" placeholder="Password" id="password" required>
-                <input type="submit" value="login">
-            </form>
-            <br>
-            
+        <div style="display: flex; justify-content: center; align-items: top; height: 300px;">
+            <div style="flex: 1; max-width: 33%;">
+
+            </div>
+            <div class="login login-form">
+                <h1>Login or <a href="register">Register</a></h1>
+                
+                <form action="/auth" method="post">
+                    <label for="email"></label>
+                    <input type="text" name="email" value="email" id="email" required class="login-input">
+                    <label for="password"></label>
+                    <input type="password" name="password" placeholder="Password" id="password" required class="login-input">
+                    <br>
+                    <input type="submit" value="login" class="login-submit">
+                    <br>
+                </form>
+                    <form action="/resetPass" method="post" style="display: inline;">
+                        <input type="hidden" name="resetPass" value="" id="resetPass">
+                        <a href="#" onclick="document.getElementById('resetPass').value = document.getElementById('email').value; this.parentNode.submit();">Reset Password</a>
+                    </form>
+                
+                    
+                
+                
+            </div>
+            <div style="flex: 1; max-width: 33%;"></div>
         </div>
+
+
     </body>
 </html>
+

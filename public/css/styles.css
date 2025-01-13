@@ -1,11 +1,17 @@
-body {
-    background-color: black;
-}
+@import 'responsive.css';
+
+
 h1 {
     color: white;
+    
 }
+
 h2 {
-    color: green;
+    color: red;
+}
+
+p {
+    color: white;
 }
 
 h4 {
@@ -13,11 +19,15 @@ h4 {
 }
 
 
-.img2 {
+
+
+.img2 { 
     float: right;
     max-width: 600px;
     margin-left: 20px;
+    
 }
+
 
 .nav-link {
     color: white;
@@ -29,6 +39,38 @@ h4 {
 
 .register {
     color: rgb(225, 15, 15);
-    text-align: left;
+    text-align: center;
     text-size-adjust: 50px;
 }
+
+
+.btn {
+    background-color: #02135f; /* Blue background */
+    color: #fff; /* White text */
+    padding: 10px 20px; /* Add some padding */
+    border: none; /* Remove default border */
+    border-radius: 10px; /* Add rounded corners */
+    cursor: pointer; /* Change cursor to pointer */
+    width: 200px; /* Set width */
+    height: 40px; /* Set height */
+  }
+  
+.btn:hover {
+    background-color: #02135f;/* Change background color on hover */
+    border: 2px solid #f7f7f8;/* Add a border on hover */
+    color: #fff;/* Change text color on hover */
+  }
+
+th {
+    color: yellow;
+}
+
+td {
+    color: white;
+}
+
+
+  
+  
+  
+ 

@@ -1,0 +1,24 @@
+<html>
+    <html>
+    <head>
+        <%- include('partials/navbar.ejs') %>
+        <%- include('partials/header1.ejs') %>
+        <title>Gallery</title>
+    </head>
+    <body>
+        <h2>Gallery</h2>
+        <div class="gallery" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <% if (files) { %>
+                <% files.forEach(function(file) { %>
+                    <div class="image-container">
+                        <a href="/public/events/<%= file %>" target="_blank">
+                            <img src="/public/events/<%= file %>" alt="<%= file %>" style="width:400px; height:auto;">
+                        </a>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No files found.</p>
+            <% } %>
+        </div>
+    </body>
+</html>
