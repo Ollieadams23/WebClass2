@@ -54,7 +54,7 @@ h4 {
     width: 200px; /* Set width */
     height: 40px; /* Set height */
   }
-  
+/* Add a hover effect */
 .btn:hover {
     background-color: #02135f;/* Change background color on hover */
     border: 2px solid #f7f7f8;/* Add a border on hover */
@@ -63,14 +63,40 @@ h4 {
 
 th {
     color: yellow;
+    padding: 5px;
 }
 
 td {
     color: white;
+    padding: 5px;
 }
 
+.profilemain {
+    display: flex; 
+    flex-direction: row; 
+    align-items: left;
+    width: 100vw;
+    
+}
 
+.profilemenu {
+    color: white;
+    display: flex; 
+    flex-direction: column; 
+    align-items: left;
+    width: 20%;
+}
+
+.profilestats {
+    color: white;
+    display: flex; 
+    flex-direction: column; 
+    align-items: left;
+    width: 33%;
+}
   
-  
+
+
+
   
  

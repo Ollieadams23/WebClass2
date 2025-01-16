@@ -42,8 +42,25 @@
                     <td><%= userData[0].raceclass %></td>
                 </tr>
                 <tr>
-                    <th>Member status</th>
-                    <td><%= userData[0].memberstatus %></td>
+                    <th>Membership: </th>
+                    <td><%= userData[0].membership %>
+                        <% if (userData[0].membership != 'current') { %>
+                            <div style="display: flex; flex-direction: row; align-items: center;">
+                                <form action="/charge" method="post">
+                                    <script
+                                        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                        data-key="pk_test_51K9a8jJ2j7m9aJnJ6QdRQVJfJGQB8j5a1000000040001"
+                                        data-amount="5000"
+                                        data-name="Southland Dirt Bike Riders Club"
+                                        data-description="Membership"
+                                        data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                        data-locale="auto"
+                                        data-currency="nzd">
+                                    </script>
+                                </form>
+                            </div>
+                        <% } %>
+                    </td>
                 </tr>
                 
             </table>

@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <%- include('partials/navbar.ejs') %>
+        <%- include('partials/header1.ejs') %>
+    </head>
+    <body>
+        <p>User Management</p>
+<!-- users.ejs -->
+
+<h1>Users</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Member ID</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>Age</th>
+      <th>Race Class</th>
+      <th>Role</th>
+      <th>Membership</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% users.forEach(function(user) { %>
+      <tr>
+        <td><%= user.memberid %></td>
+        <td><%= user.firstname %></td>
+        <td><%= user.lastname %></td>
+        <td><%= user.email %></td>
+        <td><%= user.age %></td>
+        <td><%= user.raceclass %></td>
+        <td><%= user.role %></td>
+        <td><%= user.membership %></td>
+        <td>
+          <a href="/users/<%= user.memberid %>/edit">Edit</a>
+          <form action="/users/<%= user.memberid %>/delete" method="post">
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+
+<!-- Edit User Form -->
+<div id="edit-user-form" style="display:none;">
+  <h2>Edit User</h2>
+  <form action="/users/<%= user.memberid %>" method="post">
+    <label>First Name:</label>
+    <input type="text" name="firstname" value="<%= user.firstname %>"><br>
+    <label>Last Name:</label>
+    <input type="text" name="lastname" value="<%= user.lastname %>"><br>
+    <label>Email:</label>
+    <input type="email" name="email" value="<%= user.email %>"><br>
+    <label>Age:</label>
+    <input type="number" name="age" value="<%= user.age %>"><br>
+    <label>Race Class:</label>
+    <input type="text" name="raceclass" value="<%= user.raceclass %>"><br>
+    <label>Role:</label>
+    <input type="text" name="role" value="<%= user.role %>"><br>
+    <label>Membership:</label>
+    <input type="text" name="membership" value="<%= user.membership %>"><br>
+    <button type="submit">Save Changes</button>
+  </form>
+</div>
+
+<!-- Delete User Confirmation -->
+<div id="delete-user-confirmation" style="display:none;">
+  <h2>Delete User Confirmation</h2>
+  <p>Are you sure you want to delete user <%= user.memberid %>?</p>
+  <form action="/users/<%= user.memberid %>/delete" method="post">
+    <button type="submit">Yes, Delete User</button>
+    <button type="button" onclick="history.back()">No, Go Back</button>
+  </form>
+</div>

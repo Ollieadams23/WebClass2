@@ -11,43 +11,63 @@
            Admin Dashboard
 
         </p>
-        <p style="color:#7fae5d">
-            more text that i dont want to write
+        
+        <div class="profilemain">
+            <div class="profilemenu">
+                <%- include('partials/adminmenu.ejs') %>
+                
+            </div>
+            <div class="profilestats"> 
+                <h2>Profile</h2>
+                <img src="/public/images/profile.jpg" style="margin: auto;"/>   
+                <table>
+                    <tr>
+                        <th>Email: </th>
+                        <td><%= userData[0].email %></td>
+                    </tr>
+                    <tr>
+                        <th>Name: </th>
+                        <td><%= userData[0].firstname %></td>
+                    </tr>
+                    <tr>
+                        <th>Last Name: </th>
+                        <td><%= userData[0].lastname %></td>
+                    </tr>
+                    <tr>
+                        <th>Age: </th>
+                        <td><%= userData[0].age %></td>
+                    </tr>
+                    
+                    <tr>
+                        <th>Class: </th>
+                        <td><%= userData[0].raceclass %></td>
+                    </tr>
+                    <tr>
+                        <th>Membership:</th>
+                        <td><%= userData[0].membership %></td>
+                        <td><% if (userData[0].membership != 'current') { %>
+                                <div style="display: flex; flex-direction: column; align-items: right;">
+                                    <form action="/charge" method="post">
+                                        <script
+                                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                            data-key="pk_test_51K9a8jJ2j7m9aJnJ6QdRQVJfJGQB8j5a1000000040001"
+                                            data-amount="5000"
+                                            data-name="Southland Dirt Bike Riders Club"
+                                            data-description="Membership"
+                                            data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                            data-locale="auto"
+                                            data-currency="nzd">
+                                        </script>
+                                    </form>
+                                </div>
+                        <% } %></td>
 
-        </p>
-
-        <div class="profile" style="display: flex; flex-direction: column; align-items: center;"> 
-            <h2>Profile</h2>
-            <img src="/public/images/profile.jpg" style="margin: auto;"/>   
-            <table>
-                <tr>
-                    <th>Email: </th>
-                    <td><%= userData[0].email %></td>
-                </tr>
-                <tr>
-                    <th>Name: </th>
-                    <td><%= userData[0].firstname %></td>
-                </tr>
-                <tr>
-                    <th>Last Name: </th>
-                    <td><%= userData[0].lastname %></td>
-                </tr>
-                <tr>
-                    <th>Age: </th>
-                    <td><%= userData[0].age %></td>
+                    </td>
                 </tr>
                 
-                <tr>
-                    <th>Class: </th>
-                    <td><%= userData[0].raceclass %></td>
-                </tr>
-                <tr>
-                    <th>Member status</th>
-                    <td><%= userData[0].memberstatus %></td>
-                </tr>
-                
-            </table>
+                </table>
+            </div>
+            <div class="profilerightspace"  style="width: 5%; display: flex; flex-direction: column; align-items: center;">
         </div>
-
     </body>
 </html>

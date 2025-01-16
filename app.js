@@ -54,9 +54,10 @@ const transport = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   auth: {
-    user: 'ollieadams511@gmail.com',
-    pass: 'jesus48667722'
+    user: process.env.EMAIL_SERVER_ACCOUNT,
+    pass: process.env.EMAIL_PASSWORD
   }
+  
 });
 
 // Define password reset email template
@@ -122,6 +123,16 @@ module.exports = router;
   app.get('/', function (req, res){
     res.render("home");
   });
+
+  app.get('/userman', function (req, res){
+    conn.query("SELECT * FROM members", function (err, result) {
+      if (err) throw err;
+      console.log(result);
+    res.render('userman', { userData: req.session.userData, members: result});
+    });
+ });
+
+ 
 
  
  app.get('/register', function (req, res){
@@ -190,7 +201,7 @@ module.exports = router;
     if (req.session.loggedIn === true) {
         console.log('loggedIn?app 189', req.session.loggedIn)
         if 
-          (req.session.userData[0].role === 'admin')
+          (req.session.userData[0].role === 'admin')//if is spelt "Admin" it doesnt work, doesnt error either
           res.render('profileAdmin', { userData: req.session.userData, loggedIn: req.session.loggedIn });
         } else if
           (req.session.role === 'member'){
@@ -198,6 +209,7 @@ module.exports = router;
         }
     else {
         res.render('fail');
+        console.log('fail');
     }
 
  });
@@ -215,9 +227,18 @@ app.get('/results', function(req, res){
     res.render("results");
  });
 
+ app.get('/buymembership', function(req, res){
+  res.render("buymembership");
+});
+
  app.get('/rules', function(req, res){
     res.sendFile(__dirname + '/public/Constitution2023.pdf');
  });
+
+ app.get('/bikeclasses', function(req, res){
+  res.sendFile(__dirname + '/public/bikeclasses.pdf');
+});
+
 
 
  //registration
@@ -251,6 +272,36 @@ app.get('/results', function(req, res){
             });
         }
     });
+});
+
+//delete user
+app.post('/deleteUser', function(req, res, next) {
+  var id = user.memberid;
+  var sql = 'DELETE FROM members WHERE id = ?';
+  conn.query(sql, [memberid], function(err, result) {
+      if (err) throw err;
+      console.log('record deleted');
+      res.redirect('/userman');
+  });
+});
+
+//update user
+app.post('/updateUser', function(req, res, next) {
+  var memberid = req.body.memberid;
+  var firstname = req.body.firstname;
+  var lastname = req.body.lastname;
+  var email = req.body.email;
+  var age = req.body.age;
+  var raceclass = req.body.raceclass;
+  var role = req.body.role;
+  var membership = req.body.membership;
+  console.log('userID', memberid, firstname, lastname, email, age, raceclass, role, membership);
+  var sql = 'UPDATE members SET firstname = ?, lastname = ?, email = ?, age = ?, raceclass = ?, role = ?, membership = ? WHERE memberid = ?';
+  conn.query(sql, [firstname, lastname, email, age, raceclass, role, membership, memberid], function(err, result) {
+      if (err) throw err;
+      console.log('record updated');
+      res.redirect('/userman');
+  });
 });
 
 
