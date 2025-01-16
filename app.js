@@ -6,7 +6,6 @@ app.set('view engine','ejs');
 
 // Import required modules
 //start setup password reset
-const nodemailer = require('nodemailer');
 const ejs = require('ejs');
 
 
@@ -49,77 +48,6 @@ function getFiles() {
 
 
   //define routes
-// Set up email transport using Nodemailer
-const transport = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  auth: {
-    user: process.env.EMAIL_SERVER_ACCOUNT,
-    pass: process.env.EMAIL_PASSWORD
-  }
-  
-});
-
-// Define password reset email template
-const passwordResetTemplate = (user, resetLink) => {
-  return ejs.render(`
-    <h1>Password Reset Request</h1>
-    <p>Click this link to reset your password: <a href="${resetLink}">${resetLink}</a></p>
-  `, { user, resetLink });
-};
-
-// Define route for sending password reset email
-app.post('/resetPass', (req, res) => {
-  const email = req.body.email;
-  const user = { email }; // retrieve user from database using email
-  const resetLink = 'localhost:3000/resetpassword'; // generate password reset link
-  const html = passwordResetTemplate(user, resetLink);
-
-  // Send email using nodemailer
-  transport.sendMail({
-    from: 'your-email@example.com',
-    to: email,
-    subject: 'Password Reset Request',
-    html
-  }, (err, info) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error sending email');
-    } else {
-      res.send('Password reset email sent successfully');
-    }
-  })
-})
-
-const router = express.Router();
-router.post('/resetPass', (req, res) => {
-  const { email } = req.body;
-  const user = { email }; // retrieve user from database using email
-  const resetLink = 'localhost:3000/resetpassword'; // generate password reset link
-  const html = passwordResetTemplate(user, resetLink);
-
-
-  // Send email using Nodemailer
-  transport.sendMail({
-    from: 'your-email@example.com',
-    to: email,
-    subject: 'Password Reset Request',
-    html
-  }, (err, info) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error sending email');
-    } else {
-      res.send('Password reset email sent successfully');
-    }
-  });
-});
-
-// Export router
-module.exports = router;
-//end setup password reset
-
-
   app.get('/', function (req, res){
     res.render("home");
   });
