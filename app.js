@@ -3,7 +3,6 @@ const app = express();
 const session = require('express-session');
 const conn = require('./dbConfig');
 app.set('view engine','ejs');
-
 // Import required modules
 //start setup password reset
 const ejs = require('ejs');
@@ -55,12 +54,11 @@ function getFiles() {
   app.get('/userman', function (req, res){
     conn.query("SELECT * FROM members", function (err, result) {
       if (err) throw err;
-      console.log(result);
+      //console.log(result);
     res.render('userman', { userData: req.session.userData, members: result});
     });
  });
 
- 
 
  
  app.get('/register', function (req, res){
@@ -203,15 +201,23 @@ app.get('/results', function(req, res){
 });
 
 //delete user
-app.post('/deleteUser', function(req, res, next) {
-  var id = user.memberid;
-  var sql = 'DELETE FROM members WHERE id = ?';
-  conn.query(sql, [memberid], function(err, result) {
-      if (err) throw err;
-      console.log('record deleted');
-      res.redirect('/userman');
+
+app.post('/deleteUser', (req, res) => {
+  const memberid = req.body.memberid;
+  // delete user from database
+  console.log('deleting user with id:', memberid);
+  conn.query('DELETE FROM members WHERE memberid = ?', [memberid], (err, results) => {
+    if (err) {
+      console.error('error deleting user:', err);
+      res.status(500).send({ message: 'Error deleting user' });
+    } else {
+      //res.send({ message: 'User deleted successfully' }); //cant have 2 x res
+      res.redirect('userman');
+    }
   });
 });
+
+
 
 //update user
 app.post('/updateUser', function(req, res, next) {
