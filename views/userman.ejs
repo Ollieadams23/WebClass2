@@ -20,24 +20,40 @@
 
                 <table>
                     <tr>
+                        <div><input type="search" placeholder="Search" name="search" value="" id="search"></div>
+                        <th></th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Email</th>
-                        <th>Age</th>
+                        <th>birthDate</th>
                         <th>Class</th>
                         <th>Role</th>
                         <th>Membership</th>
+                        <th>biketype</th>
+                        <th>Race#</th>
                         <th>Action</th>
                     </tr>
                     <% members.forEach(function(user) { %>
                         <tr>
-                            <td><input type="hidden" name="memberid" value="<%= user.memberid %></td>
-                            <td style="width: 20%;"><input type="text" name="firstname" value="<%= user.firstname %>" style="width: 100%;"></td>
-                            <td style="width: 25%;"><input type="text" name="lastname" value="<%= user.lastname %>" style="width: 100%;"></td>
-                            <td><input type="text" name="email" value="<%= user.email %>"></td>
-                            <td><input type="text" name="age" value="<%= user.age %>" style="width: 100%;"></td>
+                            <td><input type="hidden" name="memberid" value="<%= user.memberid %>"></td>
+                            <td style="width: 20%;">
+                                <input type="text" name="firstname1" 
+                                placeholder="<%= user.firstname %>" 
+                                value="<%= user.firstname %>" 
+                                style="width: 100%" 
+                                oninput="console.log('oninput triggered'); document.getElementById('firstname' + <%= user.memberid %>).value = this.value" >
+                            </td>
+                            <td style="width: 10%;"><input type="text" name="lastname1" value="<%= user.lastname %>" style="width: 100%;" 
+                                oninput="console.log('oninput triggered'); document.getElementById('lastname' + <%= user.memberid %>).value = this.value" >
+                            </td>
+                            <td><input type="email" name="email" value="<%= user.email %>"
+                                oninput="console.log('oninput triggered'); document.getElementById('email' + <%= user.memberid %>).value = this.value" >
+                            </td>
+                            <td><input type="text" name="birthDate" value="<%= user.birthDate %>" style="width: 100%;"
+                                oninput="console.log('oninput triggered'); document.getElementById('birthDate' + <%= user.memberid %>).value = this.value" >
+                            </td>
                             <td>
-                                <select name="raceclass">
+                                <select name="raceclass" oninput="console.log('oninput triggered'); document.getElementById('raceclass' + <%= user.memberid %>).value = this.value" >
                                     <option value="SnrA" <%= user.raceclass === 'SnrA' ? 'selected' : '' %>>SnrA</option>
                                     <option value="SnrB" <%= user.raceclass === 'SnrB' ? 'selected' : '' %>>SnrB</option>
                                     <option value="SnrC" <%= user.raceclass === 'SnrC' ? 'selected' : '' %>>SnrC</option>
@@ -51,20 +67,39 @@
                                 </select>
                             </td>
                             <td>
-                                <select name="role">
-                                    <option value="Admin" <%= user.role === 'Admin' ? 'selected' : '' %>>Admin</option>
-                                    <option value="Member" <%= user.role === 'Member' ? 'selected' : '' %>>Member</option>
+                                <select name="role" oninput="console.log('oninput triggered'); document.getElementById('role' + <%= user.memberid %>).value = this.value" >
+                                    <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>admin</option>
+                                    <option value="member" <%= user.role === 'member' ? 'selected' : '' %>>member</option>
+
                                 </select>
                             </td>
                             <td>
-                                <select name="membership">
+                                <select name="membership" oninput="console.log('oninput triggered'); document.getElementById('membership' + <%= user.memberid %>).value = this.value" >
                                     <option value="Current" <%= user.membership === 'Current' ? 'selected' : '' %>>Current</option>
                                     <option value="Not Current" <%= user.membership === 'Not Current' ? 'selected' : '' %>>Not Current</option>
                                 </select>
                             </td>
+                            <td><input type="text" name="biketype" value="<%= user.biketype %>" style="width: 100%;"
+                                oninput="console.log('oninput triggered'); document.getElementById('biketype' + <%= user.memberid %>).value = this.value" >
+                            </td>
+                            <td><input type="text" name="racenumber" value="<%= user.racenumber %>" style="width: 100%;"
+                                oninput="console.log('oninput triggered'); document.getElementById('racenumber' + <%= user.memberid %>).value = this.value" >
+                            </td>
+
+
+                            
                             <td>
                                 <form action="/updateUser" method="post">
                                     <input type="hidden" name="memberid" value="<%= user.memberid %>">
+                                    <input type="hidden" name="firstname" id="firstname<%= user.memberid %>" value="<%= user.firstname %>">
+                                    <input type="hidden" name="lastname" id="lastname<%= user.memberid %>" value="<%= user.lastname %>">
+                                    <input type="hidden" name="email" id="email<%= user.memberid %>" value="<%= user.email %>">
+                                    <input type="hidden" name="birthDate" id="birthDate<%= user.memberid %>" value="<%= user.birthDate %>">
+                                    <input type="hidden" name="raceclass" id="raceclass<%= user.memberid %>" value="<%= user.raceclass %>">
+                                    <input type="hidden" name="role" id="role<%= user.memberid %>" value="<%= user.role %>">
+                                    <input type="hidden" name="membership" id="membership<%= user.memberid %>" value="<%= user.membership %>">
+                                    <input type="hidden" name="biketype" id="biketype<%= user.memberid %>" value="<%= user.biketype %>">
+                                    <input type="hidden" name="racenumber" id="racenumber<%= user.memberid %>" value="<%= user.racenumber %>">
                                     <button type="submit">Update</button>
                                 </form>
                             </td>
@@ -78,5 +113,22 @@
                     <% }); %>
                 </table>
             </div>
-    </body>
+            
+            <script>
+                const searchBox = document.getElementById('search');
+              
+                searchBox.addEventListener('keydown', function(event) {
+                  if (event.key === 'Enter') {
+                    const searchText = searchBox.value.trim().toLowerCase();
+                    if (searchText) {
+                      const found = window.find(searchText, false, false, false, false, false, true);
+                      if (found) {
+                        const foundElement = window.getSelection().anchorNode.parentNode;
+                        foundElement.scrollIntoView();
+                      }
+                    }
+                  }
+                });
+              </script>
+                  </body>
 </html>

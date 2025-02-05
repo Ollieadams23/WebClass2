@@ -1,0 +1,106 @@
+<html>
+    <head>
+        
+        <%- include('partials/navbar.ejs') %>
+        <%- include('partials/header1.ejs') %>
+    </head>
+    <body>
+        <h2>Events</h2>
+        <div class="eventmain" style="display: flex; flex-direction: row;">
+            <script>
+                async function uploadFile() {
+                  console.log('Upload file button clicked!');
+                  const fileInput = document.getElementById('file-upload');
+                  const file = fileInput.files[0];
+                  const formData = new FormData();
+                  formData.append('file', file);
+                    
+                  try {
+                    const response = await fetch('/upload', {
+                      method: 'POST',
+                      body: formData
+                    });
+                    const data = await response.json();
+                    console.log(data);
+                  } catch (error) {
+                    console.error(error);
+                  }
+                    window.location.reload();
+                }
+              </script>
+              ...
+            <div class="eventbuttons" style="width: 20%; display: flex; flex-direction: column; justify-content: left; align-items: left;">
+            <input type="file" id="file-upload" style="color: white;"><br>
+            <button onclick="uploadFile()">Clik to Upload Event Poster</button>
+            </div>
+            <div class="eventsgallery" style="width: 33%; display: flex; flex-direction: column; justify-content: left; align-items: left;">
+                <% if (files) { %>
+                    <% files.forEach(function(file) { %>
+                        <div class="image-container">
+                            <a href="/public/events/<%= file %>" target="_blank">
+                                <img src="/public/events/<%= file %>" alt="<%= file %>" style="width:400px; height:auto;">
+                            </a>
+                            <button onclick="deleteFileButton('<%= file %>')">Delete Event Poster</button>
+
+                            <script>
+                              function deleteFileButton(fileName) {
+                                fetch('/delete-file/' + fileName, { method: 'POST' })
+                                  .then(response => response.json())
+                                  .then(data => console.log(data))
+                                  .catch(error => console.error(error));
+                                  window.location.reload();
+                              }
+                            </script>      
+                                              </div>
+                    <% }); %>
+                <% } else { %>
+                    <p>No files found.</p>
+                <% } %>
+            </div>
+            <div class="eventcreate" style="width: 33%; display: flex; flex-direction: column; justify-content: left; align-items: left;">
+              <h2>Events</h2>
+              <button onclick="openEventForm()">Create Event(events will auto delete after date)</button>
+              <div id="event-form-block" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border-radius:10px; box-shadow:0px 0px 10px rgba(0,0,0,0.1);">
+                <h3>Create Event</h3>
+                <form id="event-form" action="/eventcreate" method="POST">
+                  <label for="event-name">Event Name:</label>
+                  <input type="text" id="event-name" name="event-name" required><br><br>
+                  <label for="event-date">Event Date:</label>
+                  <input type="date" id="event-date" name="event-date" required pattern="\d{4}-\d{2}-\d{2}" title="Enter a date in ISO 8601 format (yyyy-mm-dd)"><br><br>
+                  
+                  <button type="submit">Submit</button>
+                  <button type="button" onclick="closeEventForm()">Cancel</button>
+                </form>
+              </div>
+              <script>
+                
+                function openEventForm() {
+                  document.getElementById('event-form-block').style.display = 'block';
+                }
+                function closeEventForm() {
+                  document.getElementById('event-form-block').style.display = 'none';
+                }
+              </script>
+                        <div>
+                          <h2>Availible events</h2>
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Event Name</th>
+                                <th>Event Date</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% events.forEach(function(event) { %>
+                                <tr>
+                                  <td><%= event.eventName %></td>
+                                  <td><%= event.eventDate %></td>
+                                </tr>
+                              <% }); %>
+                            </tbody>
+                          </table>
+                        </div>
+            </div>
+        </div>
+    </body>
+</html>

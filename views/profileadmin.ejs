@@ -34,8 +34,8 @@
                         <td><%= userData[0].lastname %></td>
                     </tr>
                     <tr>
-                        <th>Age: </th>
-                        <td><%= userData[0].age %></td>
+                        <th>birthDate: </th>
+                        <td><%= userData[0].birthDate %></td>
                     </tr>
                     
                     <tr>
@@ -43,9 +43,19 @@
                         <td><%= userData[0].raceclass %></td>
                     </tr>
                     <tr>
+                        <th>bike type: </th>
+                        <td><%= userData[0].biketype %></td>
+                    </tr>
+                    <tr>
+                        <th>Race#: </th>
+                        <td><%= userData[0].racenumber %></td>
+                    </tr>
+    
+                    <tr>
                         <th>Membership:</th>
                         <td><%= userData[0].membership %></td>
-                        <td><% if (userData[0].membership != 'current') { %>
+                        <tr>
+                        <td><% if (userData[0].membership != 'Current') { %>
                                 <div style="display: flex; flex-direction: column; align-items: right;">
                                     <form action="/charge" method="post">
                                         <script
@@ -60,14 +70,32 @@
                                         </script>
                                     </form>
                                 </div>
-                        <% } %></td>
+                        <% } %></td></tr>
 
                     </td>
                 </tr>
                 
                 </table>
             </div>
-            <div class="profilerightspace"  style="width: 5%; display: flex; flex-direction: column; align-items: center;">
-        </div>
+            <div class="profileduplicates"  style="width: 25%; display: flex; flex-direction: column; align-items: center; color: yellow;">
+                Duplicate race numbers in same class
+                        <br>
+                        <table>
+                        <thead>
+                        <tr><th>Name</th><th> &nbsp; raceclass &nbsp; </th><th> &nbsp; racenumber &nbsp; </th></tr>
+                         </thead>
+                        <tbody>
+                            <% duplicates.forEach(function(user) { %>
+                            <tr>
+                            <td><%= user.lastname %></td>
+                            <td><%= user.raceclass %></td>
+                            <td><%= user.racenumber %></td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                        </table>
+                            
+
+            </div>
     </body>
 </html>

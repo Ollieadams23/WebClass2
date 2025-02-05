@@ -61,8 +61,14 @@ h4 {
     color: #fff;/* Change text color on hover */
   }
 
-th {
+thead {
     color: yellow;
+    padding: 5px;
+}
+
+
+th {
+    color: rgb(46, 165, 106);
     padding: 5px;
 }
 

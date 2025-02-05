@@ -1,36 +1,16 @@
-CREATE TABLE Category (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    type VARCHAR(255) NOT NULL,
-    location VARCHAR(255) NOT NULL,
-    rating INT NOT NULL,
-    difficulty_level VARCHAR(255) NOT NULL,
-    seasonality VARCHAR(255) NOT NULL
-);
+DELIMITER //
+CREATE PROCEDURE insert_random_members()
+BEGIN
+  DECLARE i INT DEFAULT 0;
+  WHILE i < 50 DO
+    INSERT INTO members (memberid, firstname, lastname, email, age, raceclass, password, role, membership)
+    VALUES
+      (FLOOR(RAND() * 1000) + 30, CONCAT('First', FLOOR(RAND() * 100)), CONCAT('Last', FLOOR(RAND() * 100)), CONCAT(FLOOR(RAND() * 100), '@example.com'), FLOOR(RAND() * 100), 
+       ELT(FLOOR(RAND() * 10), 'SnrA', 'SnrB', 'SnrC', 'SnrD', 'Vets', 'JnrA', 'JnrB', 'JnrC', 'JnrD', 'MiniA', 'MiniB'), 
+       FLOOR(RAND() * 10000), 'member', IF(RAND() < 0.5, 'current', 'not current'));
+    SET i = i + 1;
+  END WHILE;
+END//
+DELIMITER ;
 
-CREATE TABLE Attraction (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    photo_gallery VARCHAR(255) NOT NULL,
-    reviews INT NOT NULL,
-    practical_info TEXT NOT NULL,
-    location_map_view VARCHAR(255) NOT NULL,
-    category_id INT NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES Category(id)
-);
-
-CREATE TABLE User (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    preferences TEXT NOT NULL
-);
-
-CREATE TABLE User_Attraction (
-    user_id INT NOT NULL,
-    attraction_id INT NOT NULL,
-    PRIMARY KEY (user_id, attraction_id),
-    FOREIGN KEY (user_id) REFERENCES User(id),
-    FOREIGN KEY (attraction_id) REFERENCES Attraction(id)
-);
+CALL insert_random_members();

@@ -16,10 +16,10 @@
 
         </p>
 
-        <div class="profile" style="display: flex; flex-direction: column; align-items: center;"> 
-            <h2>Profile</h2>
-            <img src="/public/images/profile.jpg" style="margin: auto;"/>   
+        <div class="profile" style="display: flex; flex-direction: row;justify-content: center;align-items: center;"> 
+            <img src="/public/images/profile.jpg" style="margin: auto; width: 20%;"/>   
             <table>
+                <tr><td><h2>Profile</h2></td></tr>
                 <tr>
                     <th>Email: </th>
                     <td><%= userData[0].email %></td>
@@ -33,8 +33,8 @@
                     <td><%= userData[0].lastname %></td>
                 </tr>
                 <tr>
-                    <th>Age: </th>
-                    <td><%= userData[0].age %></td>
+                    <th>birthDate: </th>
+                    <td><%= userData[0].birthDate %></td>
                 </tr>
                 
                 <tr>
@@ -42,15 +42,26 @@
                     <td><%= userData[0].raceclass %></td>
                 </tr>
                 <tr>
+                    <th>bike type: </th>
+                    <td><%= userData[0].biketype %></td>
+                </tr>
+                <tr>
+                    <th>Race#: </th>
+                    <td><%= userData[0].racenumber %></td>
+                </tr>
+
+                <tr>
                     <th>Membership: </th>
-                    <td><%= userData[0].membership %>
+                    <td><%= userData[0].membership %></td>
+                    <tr>
+                        <td>
                         <% if (userData[0].membership != 'current') { %>
                             <div style="display: flex; flex-direction: row; align-items: center;">
                                 <form action="/charge" method="post">
                                     <script
                                         src="https://checkout.stripe.com/checkout.js" class="stripe-button"
                                         data-key="pk_test_51K9a8jJ2j7m9aJnJ6QdRQVJfJGQB8j5a1000000040001"
-                                        data-amount="5000"
+                                      data-amount="5000"
                                         data-name="Southland Dirt Bike Riders Club"
                                         data-description="Membership"
                                         data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
@@ -58,13 +69,38 @@
                                         data-currency="nzd">
                                     </script>
                                 </form>
+                                
                             </div>
                         <% } %>
                     </td>
                 </tr>
                 
             </table>
-        </div>
+            <div class="profileevents"  style="display: flex; flex-direction: column;justify-content: start;align-items: top;">
+               <form action="/eventsignup" method="post">
+                    <select style="width: 100%;" name="eventName">
+                        <% events.forEach(function(events) { %>
+                            <option value="<%= events.eventName %>"><%= events.eventName %></option>
+                        <% }); %>
+                    </select>
+                    <input type="submit" value="register">
+               </form>
+               
+                <h2>registered events</h2>
+                <table>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Event Date</th>
+                        <th>Event Location</th>
 
+                    </tr>
+                    <% filteredEvents.forEach(function(filteredEvents) { %>
+                        <tr>
+                            <td><%= filteredEvents %></td>
+                        </tr>
+                    <% }); %>
+                                    </div>
+        </div>
+        
     </body>
-</html>
+</html>  

@@ -16,10 +16,12 @@
       <th>First Name</th>
       <th>Last Name</th>
       <th>Email</th>
-      <th>Age</th>
+      <th>birthDate</th>
       <th>Race Class</th>
       <th>Role</th>
       <th>Membership</th>
+      <th>biketype</th>
+      <th>Race#</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -30,7 +32,7 @@
         <td><%= user.firstname %></td>
         <td><%= user.lastname %></td>
         <td><%= user.email %></td>
-        <td><%= user.age %></td>
+        <td><%= user.birthDate %></td>
         <td><%= user.raceclass %></td>
         <td><%= user.role %></td>
         <td><%= user.membership %></td>
@@ -55,14 +57,19 @@
     <input type="text" name="lastname" value="<%= user.lastname %>"><br>
     <label>Email:</label>
     <input type="email" name="email" value="<%= user.email %>"><br>
-    <label>Age:</label>
-    <input type="number" name="age" value="<%= user.age %>"><br>
+    <label>birthDate:</label>
+    <input type="number" name="birthDate" value="<%= user.birthDate %>"><br>
     <label>Race Class:</label>
     <input type="text" name="raceclass" value="<%= user.raceclass %>"><br>
     <label>Role:</label>
     <input type="text" name="role" value="<%= user.role %>"><br>
     <label>Membership:</label>
     <input type="text" name="membership" value="<%= user.membership %>"><br>
+    <label>biketype:</label>
+    <input type="text" name="biketype" value="<%= user.biketype %>"><br>
+    <label>Race#:</label>
+    <input type="number" name="racenumber" value="<%= user.racenumber %>"><br>
+
     <button type="submit">Save Changes</button>
   </form>
 </div>
