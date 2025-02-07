@@ -1,0 +1,165 @@
+<html>
+    <head>
+        
+        <%- include('partials/navbar.ejs') %>
+        <%- include('partials/header1.ejs') %>
+        <h2 style="color:red">Welcome, <%= userData[0].email %></h2>
+    </head>
+    <body>
+
+        
+        <p style="color:rgb(241, 241, 245)">
+           Admin Dashboard
+
+        </p>
+        
+        <div class="profilemain">
+            <div class="profilemenu">
+                <%- include('partials/adminmenu.ejs') %>
+            </div>
+            <div class="membershipmanager" style="display: flex; flex-direction: column; justify-content: flex-start; align-items: left;">
+
+                <table>
+                    <tr>
+                        <div><input type="search" placeholder="Search" name="search" value="" id="search"></div>
+                        <th></th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Class</th>
+                        <th>Membership</th>
+                        <th>biketype</th>
+                        <th>Race#</th>
+                    </tr>
+                    <% members.forEach(function(user) { %>
+                        <tr>
+                            <td><input type="hidden" name="memberid" value="<%= user.memberid %>"></td>
+                            <td style="width: 20%;"><%= user.firstname %></td>
+                            <td style="width: 10%;"><%= user.lastname %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.raceclass %></td>
+                            <td><%= user.membership %></td>
+                            <td><%= user.biketype %></td>
+                            <td><%= user.racenumber %></td>
+                            
+                            
+                        </tr>
+                        <% }); %>
+                </table>
+            </div>
+            <script>//convert the members data so the js can read it
+                const membersData = <%- JSON.stringify(members) %>;
+                //console.log(membersData);
+                </script>
+        
+            <script>
+                const searchBox = document.getElementById('search');
+              
+                searchBox.addEventListener('keydown', function(event) {
+                  if (event.key === 'Enter') {
+                    const searchText = searchBox.value.trim().toLowerCase();
+                    if (searchText) {
+                      const found = window.find(searchText, false, false, false, false, false, true);
+                      if (found) {
+                        const foundElement = window.getSelection().anchorNode.parentNode;
+                        foundElement.scrollIntoView();
+                      }
+                    }
+                  }
+                });
+              </script>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>                              <script>
+                              </script>
+              <div>
+                <canvas id="myChart"></canvas>
+                <canvas id="myBarChart" height="400"></canvas>
+                <script>//executes when page has rendered and updates the chart
+                    document.addEventListener('DOMContentLoaded', function() {
+                      let ctx = document.getElementById('myChart').getContext('2d');
+                      let myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                          labels: ['Current members', 'Non-current members'],
+                          datasets: [{
+                            label: 'Membership status',
+                            data: [membersData.filter(members => members.membership === 'Current').length, membersData.filter(members => members.membership !== 'Current').length],
+                            backgroundColor: [
+                              'rgba(255, 99, 132, 0.2)',
+                              'rgba(54, 162, 235, 0.2)'
+                            ],
+                            borderColor: [
+                              'rgba(255, 99, 132, 1)',
+                              'rgba(54, 162, 235, 1)'
+                            ],
+                            borderWidth: 1
+                          }]
+                        },
+                        options: {
+                        }
+                      });
+                    });
+                  </script>    
+                  
+                  <script>
+                    // Get the class values from the members data
+const classes = membersData.map(member => member.raceclass);
+
+// Count the occurrences of each class
+const classCounts = {};
+classes.forEach(classValue => {
+  if (classCounts[classValue]) {
+    classCounts[classValue]++;
+  } else {
+    classCounts[classValue] = 1;
+  }
+});
+
+// Create the chart data
+const chartData = {
+  labels: Object.keys(classCounts),
+  datasets: [{
+    label: 'Class Counts',
+    data: Object.values(classCounts),
+    backgroundColor: [
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(255, 206, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(255, 159, 64, 0.2)'
+    ],
+    borderColor: [
+      'rgba(255, 99, 132, 1)',
+      'rgba(54, 162, 235, 1)',
+      'rgba(255, 206, 86, 1)',
+      'rgba(75, 192, 192, 1)',
+      'rgba(153, 102, 255, 1)',
+      'rgba(255, 159, 64, 1)'
+    ],
+    borderWidth: 1
+  }]
+};
+
+// Create the chart
+const ctx = document.getElementById('myBarChart').getContext('2d');
+const myBarChart = new Chart(ctx, {
+  type: 'bar',
+  data: chartData,
+  options: {
+    indexAxis: 'y',
+  scales: {
+    x: {
+      min: 0,
+      max: 40
+    }
+  }
+}});
+                  </script>
+            </div>
+                  
+        
+        
+        </body>
+
+
+                  </html>

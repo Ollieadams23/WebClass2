@@ -64,51 +64,46 @@ cron.schedule('0 2 * * *', () => {
 //but exclused any tables that dont have a memberid coloum
 //because an arror will occur if sql tries to search for memberid in a 
 //table where it does not exist
-function getTablesWithEventAndMemberid(conn, req) {
+function getTablesWithEventAndMemberid(conn, req, callback) {
   /**
    * Returns a list of tables that have 'event' in the name and also have a row with the given memberid.
    *
    * @param {mysql.Connection} conn - MySQL connection object
    * @param {object} req - Express request object
-   * @returns {Promise<string[]>} List of table names
+   * @param {function} callback - Callback function to handle the result
    */
-  return new Promise((resolve, reject) => {
-    const memberid = req.session.userData[0].memberid;
-    console.log('line 75', memberid);
-    conn.query("SHOW TABLES FROM webclass2db LIKE '%event%'", (err, rows) => {
-      if (err) {
-        reject(err);
-        console.log(rows);
-      } else {
-        const events = rows.map(row => row['Tables_in_webclass2db (%event%)']);
-                        console.log('line 80', rows);
-                        const promises = events.map(event => {
-                          return new Promise((resolve, reject) => {
-                            conn.query(`SHOW COLUMNS FROM webclass2db.${event} LIKE 'memberid'`, (err, rows) => {
-                              if (err) {
-                                reject(err);
-                              } else if (rows.length > 0) {
-                                conn.query(`SELECT 1 FROM webclass2db.${event} WHERE memberid = ?`, memberid, (err, rows) => {
-                                  if (err) {
-                                    reject(err);
-                                  } else {
-                                    resolve(rows.length > 0 ? event : null);
-                                  }
-                                });
-                              } else {
-                                resolve(null);
-                              }
-                            });
-                          });
-                        });
-                          Promise.all(promises).then(results => {
-          const filteredEvents = results.filter(result => result !== null);
-          resolve(filteredEvents);
-        }).catch(reject);
-      }
-    });
+  const memberid = req.session.userData[0].memberid;
+  console.log('line 75', memberid);
+  conn.query("SHOW TABLES FROM webclass2db LIKE '%event%'", (err, rows) => {
+    if (err) {
+      callback(err, null);
+      console.log(rows);
+    } else {
+      const events = rows.map(row => row['Tables_in_webclass2db (%event%)']);
+      console.log('line 80', rows);
+      const results = [];
+      let pending = events.length;
+      events.forEach(event => {
+        conn.query(`SHOW COLUMNS FROM webclass2db.${event} LIKE 'memberid'`, (err, rows) => {
+          if (err) {
+            callback(err, null);
+          } else if (rows.length > 0) {
+            conn.query(`SELECT 1 FROM webclass2db.${event} WHERE memberid = ?`, memberid, (err, rows) => {
+              if (err) {
+                callback(err, null);
+              } else {
+                if (rows.length > 0) results.push(event);
+                if (!--pending) callback(null, results);
+              }
+            });
+          } else {
+            if (!--pending) callback(null, results);
+          }
+        });
+      });
+    }
   });
-}  
+}
 
 
 //define functions
@@ -154,13 +149,14 @@ function deleteResult(fileName) {
 
 
 //function to get duplicate results from database
-function getDuplicates(req, results) {
+function getDuplicates(req, results, callback) {
       conn.query('SELECT lastname, raceclass, racenumber FROM members WHERE (raceclass, racenumber) IN (SELECT raceclass, racenumber FROM members GROUP BY raceclass, racenumber HAVING COUNT(*) > 1)',
       function(error, duplicateResults, fields) {
       if (error) throw error;
       req.session.duplicates = duplicateResults;
       console.log('getresultsfunction', req.session.duplicates);
-    req.session.save();  
+    req.session.save(); 
+    callback(); 
     })
 }
 
@@ -186,6 +182,15 @@ function getDuplicates(req, results) {
  });
 
 
+ app.get('/membershipman', function (req, res){
+  conn.query("SELECT * FROM members", function (err, result) {
+    if (err) throw err;
+    //console.log(result);
+  res.render('membershipman', { userData: req.session.userData, members: result, membersforbarchart: result});
+  });
+});
+
+
  //event management
  app.get('/eventman', function (req, res){
   const files = getFiles();
@@ -196,12 +201,13 @@ function getDuplicates(req, results) {
  })
   });
 
-  function eventlist(req, res) {
+  function eventList(req, res, callback) {
     conn.query("SELECT * FROM events", function (err, results) {
       if (err) throw err;
       req.session.events = results;
       req.session.save();
       console.log('eventlist', req.session);
+      callback();
 
     
     });
@@ -335,20 +341,26 @@ app.get('/resultsman', function (req, res) {
         //getDuplicates(req, results);//call function to get duplicates
         //console.log('sessiondata2', req.session);
 
-        getTablesWithEventAndMemberid(conn, req).then(filteredEvents => {
-          req.session.filteredEvents = filteredEvents;
-          req.session.save();
-        }).catch(err => {
-          console.error(err);
+        getTablesWithEventAndMemberid(conn, req, function(err, filteredEvents) {
+          if (err) {
+            console.error(err);
+          } else {
+            req.session.filteredEvents = filteredEvents;
+            req.session.save();
+          }
         });
 
          if 
           (req.session.userData[0].role === 'admin')//if is spelt "Admin" it doesnt work, doesnt error either as === in code
-          {getDuplicates(req, results),res.render('profileadmin', { userData: req.session.userData, loggedIn: req.session.loggedIn, duplicates: req.session.duplicates, filteredEvents: req.session.filteredEvents, events: req.session.events });
-        } else if 
+          {getDuplicates(req, results, function() {
+            res.render('profileadmin', { userData: req.session.userData, loggedIn: req.session.loggedIn, duplicates: req.session.duplicates, filteredEvents: req.session.filteredEvents, events: req.session.events });
+          });
+          } else if 
           (req.session.userData[0].role === 'member')
-          {eventlist(req, results),res.render('profile', { userData: req.session.userData, loggedIn: req.session.loggedIn, events: req.session.events, filteredEvents: req.session.filteredEvents });
-        }
+          {eventList(req, results, function() {
+            res.render('profile', { userData: req.session.userData, loggedIn: req.session.loggedIn, events: req.session.events, filteredEvents: req.session.filteredEvents });
+        });
+      }
         else {
           res.render('fail');
           console.log('fail');
