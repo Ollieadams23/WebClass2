@@ -12,8 +12,11 @@ A Node.js web application for club information and member management.
 ## Environment Variables
 
 Create a `.env` file with the following variables:
-DB_HOST=
-DB_USER=
+DB_HOST=localhost
+DB_USER=root
 DB_PASSWORD=
-DB_NAME=
-SESSION_SECRET=
+DB_NAME=webclass2db
+SESSION_SECRET=anything
+
+EMAIL_SERVER_ACCOUNT=
+EMAIL_SERVER_PASSWORD=
