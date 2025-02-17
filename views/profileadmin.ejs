@@ -95,7 +95,31 @@
                         </tbody>
                         </table>
                             
-
-            </div>
+                        <div class="profileevents">
+                            <form action="/eventsignup" method="post">
+                                 <select style="width: 100%;" name="eventName">
+                                     <% events.forEach(function(events) { %>
+                                         <option value="<%= events.eventName %>"><%= events.eventName %></option>
+                                     <% }); %>
+                                 </select>
+                                 <input type="submit" value="register">                            
+                                  <table>
+                                 <tr>
+                                     <th>Event Name</th>
+                                     <th>Event Date</th>
+                                     <th>Event Location</th>
+             
+                                 </tr>
+                                 <% filteredEvents.forEach(function(filteredEvents) { %>
+                                     <tr>
+                                         <td><%= filteredEvents %></td>
+                                     </tr>
+                                 <% }); %>
+                                                 </div>
+                         </div>
+        </div>
+        <script>
+</script>
+    
     </body>
 </html>

@@ -7,6 +7,12 @@
     </head>
     <body>
         <h2>Events</h2>
+        <div style="display: flex; flex-direction: row; height: 80vh;">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; width: 20%;">
+                <a href="/trackinfo" class="btn">Track Info</a>
+                <a href="/contact" class="btn">Contact</a>
+                <a href="/events" class="btn">Events</a>
+            </div>
         <div class="gallery" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
             <% if (files) { %>
                 <% files.forEach(function(file) { %>
@@ -19,6 +25,7 @@
             <% } else { %>
                 <p>No files found.</p>
             <% } %>
+        </div>
         </div>
     </body>
 </html>

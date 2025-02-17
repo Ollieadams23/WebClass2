@@ -12,12 +12,13 @@
 
         </p>
         <p style="color:#7fae5d">
-            more text that i dont want to write
+            Please check you details are correct
+            any events you have signed up for will be listed here
 
         </p>
-
-        <div class="profile" style="display: flex; flex-direction: row;justify-content: center;align-items: center;"> 
-            <img src="/public/images/profile.jpg" style="margin: auto; width: 20%;"/>   
+    <div class="profilemain"style = "display: flex; flex-direction: row;alight-items: center;">
+        <div class="profilestats"> 
+            <img src="/public/images/profile.jpg" style="margin: auto"/>   
             <table>
                 <tr><td><h2>Profile</h2></td></tr>
                 <tr>
@@ -76,7 +77,8 @@
                 </tr>
                 
             </table>
-            <div class="profileevents"  style="display: flex; flex-direction: column;justify-content: start;align-items: top;">
+            </div>
+            <div class="profileevents">
                <form action="/eventsignup" method="post">
                     <select style="width: 100%;" name="eventName">
                         <% events.forEach(function(events) { %>

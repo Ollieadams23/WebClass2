@@ -29,7 +29,7 @@
                         <th>Class</th>
                         <th>Role</th>
                         <th>Membership</th>
-                        <th>biketype</th>
+                        <th>bikeType</th>
                         <th>Race#</th>
                         <th>Action</th>
                     </tr>
@@ -37,10 +37,7 @@
                         <tr>
                             <td><input type="hidden" name="memberid" value="<%= user.memberid %>"></td>
                             <td style="width: 20%;">
-                                <input type="text" name="firstname1" 
-                                placeholder="<%= user.firstname %>" 
-                                value="<%= user.firstname %>" 
-                                style="width: 100%" 
+                                <input type="text" name="firstname1" placeholder="<%= user.firstname %>" value="<%= user.firstname %>" style="width: 100%" 
                                 oninput="console.log('oninput triggered'); document.getElementById('firstname' + <%= user.memberid %>).value = this.value" >
                             </td>
                             <td style="width: 10%;"><input type="text" name="lastname1" value="<%= user.lastname %>" style="width: 100%;" 

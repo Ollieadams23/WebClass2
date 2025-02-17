@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <%- include('partials/navbar.ejs') %>
+        <%- include('partials/header1.ejs') %>
+        
+
+        <title>SDBR</title>
+        
+        <style>
+            .home {
+                margin: 0;
+                padding: 0;
+                height: 1000px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            
+    
+        </style>
+    </head>
+    <body>
+        <div style="display: flex; flex-direction: row; height: 80vh;">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; width: 20%;">
+                <a href="/trackinfo" class="btn">Track Info</a>
+                <a href="/contact" class="btn">Contact</a>
+                <a href="/events" class="btn">Events</a>
+            </div>
+            <div style="width: 33%;">
+                <p>
+                    <b>CONTACTS</b><br>
+                Club Secretary<br>
+                Allen Shaw<br>
+                email: 8M7v6@example.com<br>
+                cell: 021 123 4567<br><br>
+                Club President<br>
+                John Doe<br>
+                email: 8M7v6@example.com<br>
+                cell: 021 123 4567<br><br>
+                Club Treasurer<br>
+                Jane Doe<br>
+                email: 8M7v6@example.com<br>
+                cell: 021 123 4567<br><br>
+                </p>
+
+            </div>
+            <div>
+                <h2>Send a Message</h2>
+    <form id="message-form">
+      <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
+      <button id="submit-btn">Send</button>
+    </form>  
+            </div>
+       </div>
+    <script>
+        const form = document.getElementById('message-form');
+        const submitBtn = document.getElementById('submit-btn');
+    
+        submitBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const message = document.getElementById('message').value;
+          fetch('/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+          })
+          .then((res) => res.json())
+          .then((data) => console.log(data))
+          .catch((err) => console.error(err));
+        });
+      </script>
+    </body>
+    
+</html>
+

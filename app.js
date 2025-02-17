@@ -2,16 +2,43 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');//for cron to delete old events
 const multer = require('multer');//to upload files
-const upload = multer({ dest: 'public/events' });//to upload files
-const uploadResult = multer({ dest: 'public/results' });//to upload files
-const util = require('util');//to convert rowpacketdata to array
+
+//to upload files for events
+const storageEvents = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/events');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage: storageEvents });
+
+//old code for uploading files, uses random file name
+/*const uploadResult = multer({ 
+  dest: 'public/results' });//to upload files
+*/
+//uploads results file preserving filename
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'public/results');
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    }
+  });
+  const uploadResult = multer({ storage: storage });
+
+
+const nodemailer = require("nodemailer");
+//const util = require('util');//to convert rowpacketdata to array
 
 const session = require('express-session');
 const conn = require('./dbConfig');
 app.set('view engine','ejs');
 // Import required modules
 //start setup password reset
-const ejs = require('ejs');
+//const ejs = require('ejs');
 
 app.use(bodyParser.json());//cron
 
@@ -27,7 +54,7 @@ app.use(express.static('/public/images'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Set up middleware and global variables
+// global variables
 app.use((req, res, next) => {
     app.locals.loggedIn = req.session.loggedIn;
     next();
@@ -61,7 +88,7 @@ cron.schedule('0 2 * * *', () => {
 //const mysql = require('mysql');
 
 //function gets event that the current user is registered in
-//but exclused any tables that dont have a memberid coloum
+//but exclused any tables that dont have a memberid column
 //because an arror will occur if sql tries to search for memberid in a 
 //table where it does not exist
 function getTablesWithEventAndMemberid(conn, req, callback) {
@@ -116,12 +143,16 @@ const path = require('path');
  * @returns {string[]} An array of file names present in the 'public/events' directory.
  */
 
+
 function getFiles() {
   const directoryPath = path.join(__dirname, 'public/events');
   const files = fs.readdirSync(directoryPath);
+  //console.log('getfiles', files);
   return files;
 }
 
+
+//gets race results files
 function getResults() {
   const directoryPath = path.join(__dirname, 'public/results');
   const files = fs.readdirSync(directoryPath);
@@ -169,6 +200,51 @@ function getDuplicates(req, results, callback) {
 
 
   //define routes
+
+
+  //send email from contacts page
+  app.post('/send-email', (req, res) => {
+    const {message} = req.body;
+    console.log(`Received message: ${message}`);
+
+
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_SERVER_ACCOUNT,
+      pass: process.env.EMAIL_SERVER_PASSWORD,
+    },
+  });
+
+const emailMessage = req.body.message;
+
+  const mailOptions = {
+    from: "clintz23@gmail.com",
+    to: "clintz23@gmail.com",
+    subject: "message from SDBR Web App",
+    text: emailMessage,
+  };
+
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email: ", error);
+    } else {
+      console.log("Email sent: ", info.response);
+    }
+  });
+});
+
+//end of email code
+
+  app.get('/contact', function (req, res){
+    res.render("contact");
+  });
+
+
   app.get('/', function (req, res){
     res.render("home");
   });
@@ -197,6 +273,7 @@ function getDuplicates(req, results, callback) {
   conn.query("SELECT * FROM events", function (err, result) {
     if (err) throw err;
     console.log('eventman',result);
+    console.log('getfiles', files)
   res.render('eventman', { files: files, events: result});
  })
   });
@@ -223,7 +300,6 @@ function getDuplicates(req, results, callback) {
 
  //upload results
  app.post('/uploadResult', uploadResult.single('file'), (req, res) => {
-  // Save the file to the uploads directory
   console.log('file uploaded');
   res.status(200).json({ message: 'File uploaded successfully' });
 });
@@ -256,7 +332,7 @@ app.post('/delete-result/:fileName', (req, res) => {
 });
  
 app.get('/resultsman', function (req, res) {
-  // uses the getfiles function
+  // uses the getResults function for the results management page
   const files = getResults();
   res.render('resultsman', { files: files });
 });
@@ -281,18 +357,14 @@ app.get('/resultsman', function (req, res) {
                 //req.session.username = results.email;
                 //req.session.role = results.role;
                 req.session.userData = results;//if i put [0] after results it doesnt work if i have it there i need to remove it from the calls in profile.ejs
-
                 //console.log('/auth ln 187', results);
-
-                
-
                 //  turned this code into a function to call instead and called from profile endpoint so that 
                 //when a user is updated because of a duplicate when you go back to profiule page it will re query DB
                 if (results[0].role === 'admin') {
-                  conn.query('SELECT lastname, raceclass, racenumber FROM members WHERE (raceclass, racenumber) IN (SELECT raceclass, racenumber FROM members GROUP BY raceclass, racenumber HAVING COUNT(*) > 1)',
-                      function(error, duplicateResults, fields) {
-                      if (error) throw error;
-                      //getDuplicates(req, results);
+                  //conn.query('SELECT lastname, raceclass, racenumber FROM members WHERE (raceclass, racenumber) IN (SELECT raceclass, racenumber FROM members GROUP BY raceclass, racenumber HAVING COUNT(*) > 1)',
+                      //function(error, duplicateResults, fields) {
+                      //if (error) throw error;
+                      getDuplicates(req, results, function() {});
                       //req.session.duplicates = duplicateResults;
                       //req.session.duplicates = duplicateResults.map(row => row.toJSON());
                       //req.session.duplicates = duplicateResults.map(row => JSON.parse(JSON.stringify(row)));
@@ -301,7 +373,7 @@ app.get('/resultsman', function (req, res) {
                       //req.session.duplicates = duplicateResults.map(row => Object.assign({}, row));
                       console.log('duplicateResults', req.session.duplicates);
                     req.session.save();  
-                    })}   
+                    }   
         
 
                 res.redirect('/profile');
@@ -333,14 +405,11 @@ app.get('/resultsman', function (req, res) {
   const results = req.session.userData;
   const events = req.session.events;
 
-  console.log('sessiondata1', req.session);//displays all session data
+  //console.log('sessiondata1', req.session);//displays all session data
     if (req.session.loggedIn === true) {
         //console.log('app.get /profile')
         //console.log('loggedin?', req.session.loggedIn)
-
-        //getDuplicates(req, results);//call function to get duplicates
         //console.log('sessiondata2', req.session);
-
         getTablesWithEventAndMemberid(conn, req, function(err, filteredEvents) {
           if (err) {
             console.error(err);
@@ -350,17 +419,22 @@ app.get('/resultsman', function (req, res) {
           }
         });
 
+        eventList(req, results, function() {
+          
+        });
+
          if 
           (req.session.userData[0].role === 'admin')//if is spelt "Admin" it doesnt work, doesnt error either as === in code
-          {getDuplicates(req, results, function() {
+          //{getDuplicates(req, results, function() {
             res.render('profileadmin', { userData: req.session.userData, loggedIn: req.session.loggedIn, duplicates: req.session.duplicates, filteredEvents: req.session.filteredEvents, events: req.session.events });
-          });
-          } else if 
+          //});
+          //} 
+          else if 
           (req.session.userData[0].role === 'member')
-          {eventList(req, results, function() {
+          
             res.render('profile', { userData: req.session.userData, loggedIn: req.session.loggedIn, events: req.session.events, filteredEvents: req.session.filteredEvents });
-        });
-      }
+        
+      
         else {
           res.render('fail');
           console.log('fail');
@@ -412,7 +486,7 @@ app.get('/trackinfo', function(req, res){
             //conn.query(sql2, [raceclass, biketype, racenumber], function(err, result) {
                 //if (err) throw err;
                 //console.log('class record inserted');
-                res.render('register');
+                res.render('login');
             });
         }
     });
@@ -542,6 +616,7 @@ app.post('/eventsignup', (req, res) => {
   const memberid = req.session.userData[0].memberid;//userdata is an object not an array so need[0]
   //console.log('eventsignup', req.session.userData.memberid);
   console.log('eventsignup', eventName, memberid);
+  
 
   // Query to retrieve table names that start with the event name
   const sql = "SHOW TABLES LIKE ?";
