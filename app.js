@@ -209,9 +209,9 @@ function getDuplicates(req, results, callback) {
 
 
 const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    host: "smtp.gmail.com",
-    port: 465,
+    service: process.env.EMAIL_SERVER,
+    host: process.env.SMTP_SERVER,
+    port: process.env.SMTP_PORT,
     secure: true,
     auth: {
       user: process.env.EMAIL_SERVER_ACCOUNT,
