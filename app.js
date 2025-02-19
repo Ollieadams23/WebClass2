@@ -63,16 +63,19 @@ app.use((req, res, next) => {
 
 // Cron job to check and delete old tables daily at 2:00 AM
 const cron = require('node-cron');
-cron.schedule('0 2 * * *', () => {
+cron.schedule('* 2 * * *', () => {
   const now = new Date();
-  conn.query("SHOW TABLES", (err, results) => {
+  conn.query("SHOW TABLES LIKE 'event_%'", (err, results) => {
     if (err) throw err;
+    console.log("cron", results);
     results.forEach(row => {
       const tableName = row[`Tables_in_your_webclass2db`];
       if (/^event_/.test(tableName)) {
         // Get the date from the table name
         const dateStr = tableName.split('_')[2];
+        console.log("dateStr", dateStr);
         const scheduledDate = new Date(dateStr);
+        console.log("scheduledDate", scheduledDate);
         if (scheduledDate < now) {
           db.query(`DROP TABLE ${tableName}`, (err, result) => {
             if (err) throw err;
@@ -222,8 +225,8 @@ const transporter = nodemailer.createTransport({
 const emailMessage = req.body.message;
 
   const mailOptions = {
-    from: "clintz23@gmail.com",
-    to: "clintz23@gmail.com",
+    from: process.env.EMAIL_SERVER_ACCOUNT,
+    to: process.env.EMAIL_SERVER_ACCOUNT,
     subject: "message from SDBR Web App",
     text: emailMessage,
   };
@@ -394,7 +397,7 @@ app.get('/resultsman', function (req, res) {
 
  // Users can access this if they are logged in
  let loggedIn = false;
-    console.log ('loggedin app.js line 157?', loggedIn)
+    console.log ('loggedin app.js line 398?', loggedIn)
  
 
 
@@ -580,6 +583,11 @@ app.post('/eventcreate', (req, res) => {
     return res.status(400).send({ message: 'Invalid date format. Please provide a valid ISO date string.' });
   }
 
+
+  //const scheduledDate = new Date(eventDate).toISOString().split('T')[0];
+  //const tableName = `event_${eventName}_${scheduledDate}`;
+
+  
   const scheduledDate = new Date(eventDate);
   const tableName = `event_${eventName}_${scheduledDate.toISOString().replace(/[-:.]/g, '')}`;
 
