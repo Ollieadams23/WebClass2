@@ -94,7 +94,7 @@ cron.schedule('* 2 * * *', () => {
 //but exclused any tables that dont have a memberid column
 //because an arror will occur if sql tries to search for memberid in a 
 //table where it does not exist
-function getTablesWithEventAndMemberid(conn, req, callback) {
+function getTablesWithEventAndMemberId(conn, req, callback) {
   /**
    * Returns a list of tables that have 'event' in the name and also have a row with the given memberid.
    *
@@ -281,6 +281,7 @@ const emailMessage = req.body.message;
  })
   });
 
+
   function eventList(req, res, callback) {
     conn.query("SELECT * FROM events", function (err, results) {
       if (err) throw err;
@@ -413,30 +414,51 @@ app.get('/resultsman', function (req, res) {
         //console.log('app.get /profile')
         //console.log('loggedin?', req.session.loggedIn)
         //console.log('sessiondata2', req.session);
-        getTablesWithEventAndMemberid(conn, req, function(err, filteredEvents) {
-          if (err) {
-            console.error(err);
-          } else {
-            req.session.filteredEvents = filteredEvents;
-            req.session.save();
-          }
-        });
+        
 
-        eventList(req, results, function() {
-          
-        });
+        
 
          if 
           (req.session.userData[0].role === 'admin')//if is spelt "Admin" it doesnt work, doesnt error either as === in code
           //{getDuplicates(req, results, function() {
-            res.render('profileadmin', { userData: req.session.userData, loggedIn: req.session.loggedIn, duplicates: req.session.duplicates, filteredEvents: req.session.filteredEvents, events: req.session.events });
+            eventList(req, null, function() {
+              
+
+              getTablesWithEventAndMemberId(conn, req, function(err, filteredEvents) {
+                if (err) {
+                  console.error(err);
+                } else {
+                  req.session.filteredEvents = filteredEvents;
+                  req.session.save();
+                  res.render('profileadmin', { userData: req.session.userData, loggedIn: req.session.loggedIn, duplicates: req.session.duplicates, filteredEvents: req.session.filteredEvents, events: req.session.events });
+
+                }
+              });
+              //this section is part of event list call which contains nothing
+              //if i put the render here it will render before the functions are finished
+              //but now when eventlist is called , after it has run it will call getTablesWithEventAndMemberId 
+              //and then when thats done it will run the rest of its code , which is the error handling 
+              //sessions saves and the render, this was a simple way without using async/await
+              //the member profile needs the same outcome, ill attemp to use different method
+              //but for now ill use the same as async.await is confusing still
+
+            });
           //});
           //} 
           else if 
           (req.session.userData[0].role === 'member')
+          eventList(req, null, function() {
+            getTablesWithEventAndMemberId(conn, req, function(err, filteredEvents) {
+              if (err) {
+                console.error(err);
+              } else {
+                req.session.filteredEvents = filteredEvents;
+                req.session.save();
+                res.render('profile', { userData: req.session.userData, loggedIn: req.session.loggedIn, events: req.session.events, filteredEvents: req.session.filteredEvents });
+
+              }
           
-            res.render('profile', { userData: req.session.userData, loggedIn: req.session.loggedIn, events: req.session.events, filteredEvents: req.session.filteredEvents });
-        
+          })});
       
         else {
           res.render('fail');
